@@ -1,7 +1,7 @@
 pragma solidity >=0.5.0 <0.6.0;
 pragma experimental ABIEncoderV2;
 
-import "https://github.com/tantv-918/Evi/blob/completeContract/contract/contracts/Evi.sol";
+import "./Evi.sol";
 import "https://github.com/smartcontractkit/chainlink/blob/develop/evm/v0.5/contracts/ChainlinkClient.sol";
 
 contract EviFactory is ChainlinkClient{
@@ -16,18 +16,17 @@ contract EviFactory is ChainlinkClient{
     uint256 rate;
   }
 
-  address payable manager = 0x8f287eA4DAD62A3A626942d149509D6457c2516C;
+  address payable manager;
 
   mapping (address => AllInsuranceOfBuyer) public contractsOfBuyer;
   mapping (string => InsurancePackage) public insurancePackage;
 
   address[] public allCustomers;
   InsurancePackage[] allPackage;
-  address public owner;
   uint256 public linkAmount = 30;
 
   constructor() public {
-    owner = msg.sender;
+    manager = msg.sender;
 
     InsurancePackage memory pack1;
     pack1.name = "Silver";
@@ -37,16 +36,16 @@ contract EviFactory is ChainlinkClient{
     allPackage.push(pack1);
 
     InsurancePackage memory pack2;
-    pack1.name = "Gold";
-    pack1.priceUSD = 5000;
-    pack1.rate = 60;
+    pack2.name = "Gold";
+    pack2.priceUSD = 5000;
+    pack2.rate = 60;
     insurancePackage["Gold"] = pack2;
     allPackage.push(pack2);
 
     InsurancePackage memory pack3;
-    pack1.name = "Platinum";
-    pack1.priceUSD = 10000;
-    pack1.rate = 100;
+    pack3.name = "Platinum";
+    pack3.priceUSD = 10000;
+    pack3.rate = 100;
     insurancePackage["Platinum"] = pack3;
     allPackage.push(pack3);
   }
@@ -76,7 +75,7 @@ contract EviFactory is ChainlinkClient{
 
     uint256 rate = insurancePackage[_packageName].rate;
 
-    address payable packageInsurance = address(new Evi(msg.sender, _location, _date, _times, _priceWei, rate, linkAmount ,_link));
+    address payable packageInsurance = address(new Evi(msg.sender, _location, _date, _times, _priceWei, rate, linkAmount ,_link, manager));
 
     packageInsurance.transfer(msg.value);
 
